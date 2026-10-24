@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Christina’s Spelling Bee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF4CC; --surface: #FFFBEA; --ink: #2A1A3A; --muted: #6B5A78;
+  --honey: #F5B700; --honey-deep: #C98F00; --line: #EAD9A0;
+  --green: #2E9E5B; --red: #D6453D; --on-color: #FFFFFF;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1C1226; --surface: #281A36; --ink: #FFF4CC; --muted: #BFAFCB;
+    --honey-deep: #FFCD3C; --line: #3D2B4E; --green: #34B368; --red: #E5534B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1C1226; --surface: #281A36; --ink: #FFF4CC; --muted: #BFAFCB;
+  --honey-deep: #FFCD3C; --line: #3D2B4E; --green: #34B368; --red: #E5534B;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; min-height: 100%;
+  background: var(--bg); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible + span { outline: 3px solid var(--honey-deep); outline-offset: 3px; }
+.display { font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+.screen { display: none; min-height: 100vh; min-height: 100dvh; padding: 1.5rem 1.25rem 0; flex-direction: column; max-width: 40rem; margin: 0 auto; }
+.screen.active { display: flex; }
+
+/* Start */
+#start { align-items: center; justify-content: center; text-align: center; gap: 1.75rem; padding-bottom: 2rem; }
+#start h1 { font-weight: 800; font-size: clamp(2.6rem, 12vw, 5rem); line-height: .9; letter-spacing: -.03em; margin: 0; }
+.setting { width: 100%; max-width: 22rem; border: 0; margin: 0; padding: 0; }
+.setting legend { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 500; color: var(--muted); margin: 0 auto .5rem; font-size: 1rem; }
+.seg { display: flex; border: 2px solid var(--line); border-radius: 999px; padding: 4px; gap: 4px; background: var(--surface); }
+.seg label { flex: 1; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; padding: .6rem .5rem; border-radius: 999px; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 500; font-size: 1.05rem; cursor: pointer; }
+.seg input:checked + span { background: var(--ink); color: var(--bg); }
+.hex {
+  width: 10rem; aspect-ratio: 1 / 1.1547;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--honey); color: #2A1A3A; border: 0;
+  font-weight: 800; font-size: 1.8rem;
+  transition: transform .15s ease, background .15s ease;
+}
+.hex:hover { background: #FFC81F; }
+.hex:active { transform: scale(.95); }
+.clock { display: flex; justify-content: center; gap: .75rem; }
+.clock label { display: flex; align-items: center; gap: .3rem; background: var(--surface); border: 2px solid var(--line); border-radius: 1rem; padding: .3rem .9rem .3rem .4rem; }
+.clock select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--ink); font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 2rem; padding: .1rem .35rem; cursor: pointer; }
+.clock select:focus-visible { outline: 3px solid var(--honey-deep); border-radius: .5rem; }
+.clock span { color: var(--muted); font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1rem; }
+.err { color: var(--red); margin: .6rem 0 0; font-size: 1rem; }
+
+/* Judge */
+#judge { gap: 1.1rem; }
+.topbar { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 1rem; }
+.text-btn { background: none; border: 0; color: var(--muted); padding: .4rem 0; text-decoration: underline; text-underline-offset: 3px; }
+.timer { display: flex; align-items: center; gap: .9rem; }
+.time { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 2.2rem; font-variant-numeric: tabular-nums; min-width: 5ch; }
+.bar { flex: 1; height: .7rem; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 100%; background: var(--honey); border-radius: 999px; }
+.timer.low .time { color: var(--red); }
+.timer.low .bar i { background: var(--red); }
+.timer.up .time { color: var(--red); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.word-card { background: var(--surface); border: 2px solid var(--line); border-radius: 1.5rem; padding: 1.6rem 1.25rem 1.4rem; text-align: center; }
+.word { font-weight: 800; font-size: clamp(2.1rem, 10vw, 3.8rem); line-height: 1.05; letter-spacing: -.02em; margin: 0; overflow-wrap: anywhere; min-height: 1.05em; }
+.word.hidden { color: transparent; text-shadow: 0 0 22px var(--muted); user-select: none; }
+.word-actions { display: flex; justify-content: center; gap: .6rem; margin-top: 1rem; flex-wrap: wrap; }
+.pill { border: 2px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: .45rem 1.05rem; font-size: 1rem; }
+.pill:hover { border-color: var(--honey-deep); }
+.detail h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 500; font-size: 1rem; color: var(--muted); margin: 0 0 .3rem; }
+.detail p { margin: 0; font-size: 1.25rem; line-height: 1.5; }
+.detail .sentence { font-style: italic; }
+.verdicts {
+  position: sticky; bottom: 0; margin-top: auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem;
+  padding: 1rem 0 calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: var(--bg);
+}
+.verdict { border: 0; border-radius: 1.1rem; padding: 1.1rem .4rem; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 1.25rem; }
+.verdict:active { transform: scale(.96); }
+.v-correct { background: var(--green); color: var(--on-color); }
+.v-pass { background: var(--honey); color: #2A1A3A; }
+.v-wrong { background: var(--red); color: var(--on-color); }
+.flip { animation: flip .25s ease; }
+@keyframes flip { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Results */
+#results { gap: 1.5rem; padding-bottom: 2rem; }
+#results h1 { font-weight: 800; font-size: clamp(2.4rem, 10vw, 3.6rem); letter-spacing: -.02em; line-height: 1; margin: .5rem 0 0; }
+#results .sub { margin: 0; color: var(--muted); font-size: 1.15rem; }
+.tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+.tally div { border-radius: 1.1rem; padding: 1rem .5rem; text-align: center; }
+.tally b { display: block; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; line-height: 1; }
+.tally span { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1rem; }
+.log { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--line); }
+.log li { display: flex; justify-content: space-between; align-items: center; padding: .7rem 0; border-bottom: 1px solid var(--line); font-size: 1.15rem; }
+.tag { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 500; font-size: .9rem; padding: .2rem .7rem; border-radius: 999px; }
+.empty { color: var(--muted); font-size: 1.15rem; margin: 0; }
+.again { border: 0; border-radius: 1.25rem; background: var(--honey); color: #2A1A3A; padding: 1.1rem; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 1.35rem; }
+@media (prefers-reduced-motion: reduce) { .flip, .timer.up .time { animation: none; } .hex { transition: none; } }
+</style>
+</head>
+<body>
+
+<section id="start" class="screen active" aria-labelledby="title">
+  <h1 id="title" class="display">Christina’s<br>Spelling<br>Bee</h1>
+
+  <fieldset class="setting">
+    <legend>Word level</legend>
+    <div class="seg">
+      <label><input type="radio" name="level" value="medium" checked><span>Medium</span></label>
+      <label><input type="radio" name="level" value="hard"><span>Hard</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="setting">
+    <legend>Game length</legend>
+    <div class="clock">
+      <label><select id="mins" aria-label="Minutes"></select><span>min</span></label>
+      <label><select id="secs" aria-label="Seconds"></select><span>sec</span></label>
+    </div>
+    <p class="err" id="err" hidden>Set a game length longer than 0 seconds.</p>
+  </fieldset>
+
+  <button class="hex display" id="startBtn">Start</button>
+</section>
+
+<section id="judge" class="screen">
+  <div class="topbar">
+    <span id="counter">Word 1</span>
+    <button class="text-btn" id="endBtn">End game</button>
+  </div>
+
+  <div class="timer" id="timer" role="timer" aria-live="off">
+    <span class="time" id="time">1:00</span>
+    <div class="bar"><i id="barFill"></i></div>
+    <button class="pill" id="pauseBtn">Pause</button>
+  </div>
+
+  <div class="word-card flip" id="card" aria-live="polite">
+    <p class="word display" id="word"></p>
+    <div class="word-actions">
+      <button class="pill" id="hideBtn">Hide word</button>
+      <button class="pill" id="sayBtn">Hear it</button>
+    </div>
+  </div>
+
+  <div class="detail">
+    <h2>Definition</h2>
+    <p id="definition"></p>
+  </div>
+  <div class="detail">
+    <h2>In a sentence</h2>
+    <p class="sentence" id="sentence"></p>
+  </div>
+
+  <div class="verdicts">
+    <button class="verdict v-correct" data-r="correct">Correct</button>
+    <button class="verdict v-pass" data-r="pass">Pass</button>
+    <button class="verdict v-wrong" data-r="wrong">Wrong</button>
+  </div>
+</section>
+
+<section id="results" class="screen">
+  <h1 class="display">Final tally</h1>
+  <p class="sub" id="summary"></p>
+  <div class="tally">
+    <div style="background:var(--green);color:var(--on-color)"><b id="nCorrect">0</b><span>Correct</span></div>
+    <div style="background:var(--honey);color:#2A1A3A"><b id="nPass">0</b><span>Passed</span></div>
+    <div style="background:var(--red);color:var(--on-color)"><b id="nWrong">0</b><span>Wrong</span></div>
+  </div>
+  <ul class="log" id="log"></ul>
+  <button class="again" id="againBtn">Play again</button>
+</section>
+
+<script>
+const MEDIUM = [
+  ["accommodate","To provide room for someone, or to make allowances for them.","The cabin can accommodate up to eight guests."],
+  ["rhythm","A strong, regular, repeated pattern of sound or movement.","She tapped the rhythm of the song on the table."],
+  ["necessary","Needed; required.","Bring only what’s necessary for the hike."],
+  ["embarrass","To make someone feel awkward or self-conscious.","Please don’t embarrass me in front of my friends."],
+  ["conscientious","Careful and thorough about doing things well.","He’s a conscientious worker who double-checks everything."],
+  ["occurrence","Something that happens; an event.","Rain in the desert is a rare occurrence."],
+  ["millennium","A period of one thousand years.","The city threw a huge party to welcome the new millennium."],
+  ["questionnaire","A written set of questions used to gather information.","Fill out the questionnaire before your appointment."],
+  ["entrepreneur","A person who starts and runs their own business.","The entrepreneur opened her third coffee shop this year."],
+  ["bureaucracy","A system of management with lots of rules, forms and procedures.","Getting the permit meant fighting through layers of bureaucracy."],
+  ["colleague","A person you work with.","I grabbed lunch with a colleague from accounting."],
+  ["guarantee","A firm promise that something will happen or be done.","The store offers a money-back guarantee."],
+  ["liaison","A person who connects and communicates between two groups.","She’s the liaison between the sales team and engineering."],
+  ["mischievous","Playfully causing small amounts of trouble.","The mischievous puppy hid my shoes again."],
+  ["noticeable","Easy to see or notice.","There was a noticeable drop in temperature after sunset."],
+  ["parallel","Side by side and always the same distance apart.","The two streets run parallel to each other."],
+  ["perseverance","Continued effort to do something despite difficulty.","Finishing the marathon took real perseverance."],
+  ["playwright","A person who writes plays.","The playwright came out for a bow on opening night."],
+  ["possession","Something you own, or the state of owning it.","His most prized possession is an old guitar."],
+  ["rehearsal","A practice session before a performance or event.","The wedding rehearsal ran late."],
+  ["reminisce","To think or talk fondly about past experiences.","We love to reminisce about our college road trips."],
+  ["silhouette","The dark outline of something against a lighter background.","We could see the silhouette of the skyline at sunset."],
+  ["souvenir","An item kept as a reminder of a place or event.","I bought a magnet as a souvenir from Lisbon."],
+  ["supersede","To replace something older or less effective.","The new policy will supersede the old one."],
+  ["threshold","The strip of floor at a doorway; the point where something begins.","He carried her across the threshold."],
+  ["vacuum","A space with no matter in it, or a machine that cleans with suction.","I need to vacuum the living room before guests arrive."],
+  ["conscience","Your inner sense of right and wrong.","His conscience wouldn’t let him keep the extra change."],
+  ["camouflage","Coloring or covering that helps something blend into its surroundings.","The lizard’s camouflage made it almost invisible."],
+  ["cemetery","A place where people are buried.","The old cemetery sits at the top of the hill."],
+  ["committee","A group of people chosen to handle a particular task.","The planning committee meets every Tuesday."],
+  ["dilemma","A situation where you must make a hard choice between options.","Choosing between the two job offers was a real dilemma."],
+  ["exhilarating","Making you feel very excited and full of energy.","The first drop on the roller coaster was exhilarating."],
+  ["fluorescent","Very bright and glowing; also a type of tube lighting.","The office had harsh fluorescent lights."],
+  ["harass","To repeatedly bother or pressure someone.","The telemarketers kept calling to harass him."],
+  ["hierarchy","A system where people or things are ranked by level.","The company has a strict hierarchy."],
+  ["hygiene","Habits that keep you clean and healthy.","Good dental hygiene includes flossing every day."],
+  ["hypocrisy","Claiming beliefs or standards you don’t actually follow.","Lecturing others about littering while tossing trash is pure hypocrisy."],
+  ["indispensable","Absolutely necessary; impossible to do without.","Her coffee maker is indispensable in the morning."],
+  ["leisure","Free time for relaxing or enjoying yourself.","He reads novels in his leisure time."],
+  ["lieutenant","A military officer rank; also a trusted second-in-command.","The lieutenant gave the order to move out."],
+  ["maintenance","The work of keeping something in good condition.","The pool is closed for maintenance."],
+  ["mayonnaise","A thick, creamy sauce made from egg yolks and oil.","Hold the mayonnaise on my sandwich, please."],
+  ["medieval","Relating to the Middle Ages.","We toured a medieval castle in Spain."],
+  ["miniature","A very small version of something.","He collects miniature trains."],
+  ["misspell","To spell a word incorrectly.","Try not to misspell anything tonight."],
+  ["mortgage","A loan used to buy a home or property.","They finally paid off their mortgage."],
+  ["phenomenon","A remarkable event or fact that can be observed.","The northern lights are a stunning natural phenomenon."],
+  ["pneumonia","An infection that inflames the lungs.","She stayed home for a week with pneumonia."],
+  ["pronunciation","The way a word is said out loud.","The pronunciation of that town’s name surprised everyone."],
+  ["psychology","The study of the mind and behavior.","He majored in psychology."],
+  ["quarantine","A period of isolation to keep a disease from spreading.","The new puppy had to stay in quarantine for two weeks."],
+  ["renaissance","A revival of interest or activity; also the European cultural period.","The old neighborhood is going through a renaissance."],
+  ["resuscitate","To revive someone who has stopped breathing or lost consciousness.","The lifeguard was able to resuscitate the swimmer."],
+  ["sophomore","A student in their second year of high school or college.","My cousin is a sophomore at UT."],
+  ["surveillance","Close watching of a person or place.","The store is under video surveillance."],
+  ["temperament","A person’s or animal’s typical nature or mood.","The dog has a calm temperament."],
+  ["acquaintance","Someone you know, but not very well.","He’s more of an acquaintance than a friend."],
+  ["chauffeur","A person hired to drive a car for someone else.","The chauffeur waited outside the hotel."],
+  ["caffeine","The stimulant found in coffee, tea and energy drinks.","I’ve had way too much caffeine today."],
+  ["cinnamon","A sweet, warm spice made from tree bark.","Sprinkle some cinnamon on the oatmeal."],
+  ["broccoli","A green vegetable with small tree-like florets.","Kids often refuse to eat their broccoli."],
+  ["zucchini","A long green summer squash.","She grilled zucchini for the barbecue."],
+  ["rendezvous","A planned meeting at a set time and place.","Our rendezvous point is the fountain at noon."],
+  ["colonel","A high-ranking military officer.","The colonel retired after thirty years of service."],
+  ["karaoke","Singing along to recorded music with the lyrics on a screen.","Karaoke night always gets loud after ten."],
+  ["mosquito","A small flying insect that bites.","A mosquito kept buzzing in my ear all night."],
+  ["receipt","A piece of paper showing that something was paid for.","Keep the receipt in case you need to return it."],
+  ["pursue","To chase or follow; to work toward a goal.","She decided to pursue a career in law."],
+  ["vengeance","Punishment given in return for a wrong.","The villain swore vengeance on the hero."],
+  ["yacht","A large, often luxurious boat used for pleasure.","They rented a yacht for the weekend."],
+  ["fuchsia","A vivid purplish-pink color.","She wore a fuchsia dress to the wedding."],
+  ["handkerchief","A small square of cloth for wiping your nose or face.","He offered her a handkerchief."],
+  ["bizarre","Very strange or unusual.","I had the most bizarre dream last night."],
+  ["boulevard","A wide city street, often lined with trees.","The parade went down the main boulevard."],
+  ["Wednesday","The day of the week after Tuesday.","We go to trivia night every Wednesday."],
+  ["February","The second month of the year.","Her birthday is in February."],
+  ["achievement","Something accomplished through effort or skill.","Graduating was a huge achievement for him."],
+  ["amateur","Someone who does something for fun rather than as a job.","He’s an amateur photographer."],
+  ["awkward","Uncomfortable or embarrassing; also clumsy.","There was an awkward silence after the joke."],
+  ["tyranny","Cruel and unfair use of power.","The people rose up against tyranny."],
+  ["occasionally","Sometimes, but not often.","We occasionally go hiking on weekends."],
+  ["privilege","A special right or advantage.","It’s a privilege to be here tonight."],
+  ["restaurant","A place where meals are prepared and served.","Let’s try the new restaurant downtown."],
+  ["separate","To divide or keep apart.","Separate the egg whites from the yolks."],
+  ["definitely","Without any doubt.","I’m definitely coming to the party."],
+  ["bouquet","An arranged bunch of flowers.","The bride tossed her bouquet into the crowd."],
+  ["ricochet","To bounce off a surface at an angle.","The puck can ricochet off the boards."],
+  ["plateau","A flat, raised area of land; or a period of little progress.","My running times hit a plateau after a few months."],
+  ["subtle","Delicate and not obvious.","There was a subtle hint of lime in the drink."],
+  ["debris","Scattered pieces of something broken or destroyed.","Debris covered the road after the storm."],
+  ["gauge","To estimate or measure; also a measuring instrument.","Check the gas gauge before the road trip."],
+  ["personnel","The people who work for an organization.","Only authorized personnel can enter this room."],
+  ["vinaigrette","A salad dressing made of oil and vinegar.","The salad came with a lemon vinaigrette."],
+  ["quesadilla","A tortilla filled with cheese and grilled until melted.","I ordered a chicken quesadilla."],
+  ["connoisseur","An expert judge in matters of taste.","He considers himself a connoisseur of barbecue."],
+  ["unnecessary","Not needed.","Let’s avoid any unnecessary drama tonight."]
+];
+
+const HARD = [
+  ["ubiquitous","Present or found everywhere.","Smartphones have become ubiquitous in modern life."],
+  ["juxtaposition","Placing two contrasting things side by side.","The juxtaposition of old and new buildings defines the skyline."],
+  ["idiosyncrasy","A habit or quirk peculiar to one person.","Her one idiosyncrasy is eating the pizza crust first."],
+  ["sycophant","A person who flatters powerful people to gain favor.","The boss promoted a sycophant over a skilled worker."],
+  ["acquiesce","To accept or agree reluctantly, without protest.","After hours of debate, the board chose to acquiesce."],
+  ["ephemeral","Lasting for a very short time.","Social media trends are often ephemeral."],
+  ["magnanimous","Generous and forgiving, especially toward a rival.","She was magnanimous in victory."],
+  ["obsequious","Overly eager to please or obey.","The waiter’s obsequious manner made us uncomfortable."],
+  ["surreptitious","Done secretly to avoid being noticed.","He took a surreptitious glance at his phone."],
+  ["quintessential","The most perfect or typical example of something.","Brisket is the quintessential Texas barbecue."],
+  ["anachronism","Something placed in the wrong time period.","The wristwatch in the medieval film was an obvious anachronism."],
+  ["dichotomy","A division into two sharply contrasting parts.","The article explores the dichotomy between work and leisure."],
+  ["egregious","Outstandingly bad; shocking.","The referee made an egregious call in the final minute."],
+  ["esoteric","Understood by only a small group with special knowledge.","The lecture was full of esoteric references."],
+  ["hegemony","Dominance of one group or nation over others.","The empire’s hegemony lasted for centuries."],
+  ["iconoclast","A person who attacks cherished beliefs or traditions.","The director was an iconoclast who ignored Hollywood’s rules."],
+  ["onomatopoeia","A word that imitates the sound it describes.","‘Buzz’ is a classic example of onomatopoeia."],
+  ["paradigm","A typical model or pattern; a framework of thinking.","The discovery caused a paradigm shift in physics."],
+  ["pernicious","Harmful in a gradual or subtle way.","Misinformation has a pernicious effect on public trust."],
+  ["recalcitrant","Stubbornly uncooperative.","The recalcitrant toddler refused to put on his shoes."],
+  ["sanctimonious","Acting morally superior to others.","His sanctimonious lecture annoyed everyone at the table."],
+  ["serendipity","Finding something good purely by chance.","Meeting her at the airport was pure serendipity."],
+  ["vicissitude","An unwelcome or unexpected change in circumstances.","The company survived every vicissitude of the market."],
+  ["zeitgeist","The general mood or spirit of a particular era.","The song captured the zeitgeist of the nineties."],
+  ["cacophony","A harsh, jarring mix of sounds.","A cacophony of car horns filled the street."],
+  ["epitome","A perfect example of a quality or type.","She is the epitome of grace under pressure."],
+  ["hyperbole","Deliberate exaggeration for effect.","Saying I’d die for a taco was hyperbole."],
+  ["labyrinth","A complicated maze.","The old library was a labyrinth of narrow aisles."],
+  ["minuscule","Extremely small.","The difference in price was minuscule."],
+  ["nonchalant","Calm and casually unconcerned.","He was oddly nonchalant about missing his flight."],
+  ["ostracize","To exclude someone from a group.","The town began to ostracize the outspoken newcomer."],
+  ["paraphernalia","Miscellaneous equipment for a particular activity.","The garage was full of camping paraphernalia."],
+  ["precocious","Developing abilities earlier than usual.","The precocious child was reading by age three."],
+  ["prerogative","A right or privilege belonging to a person or role.","It’s your prerogative to change your mind."],
+  ["reconnaissance","Exploring an area to gather information.","The team sent a drone on a reconnaissance mission."],
+  ["sacrilegious","Disrespectful toward something sacred.","Putting ketchup on brisket is sacrilegious in Texas."],
+  ["superfluous","More than is needed; unnecessary.","Cut the superfluous words from your essay."],
+  ["unequivocal","Leaving no doubt; completely clear.","Her answer was an unequivocal no."],
+  ["vacillate","To waver between different opinions or actions.","He tends to vacillate whenever he orders dinner."],
+  ["verisimilitude","The appearance of being true or real.","The novel’s period details add verisimilitude."],
+  ["xenophobia","Fear or dislike of people from other countries.","The editorial condemned rising xenophobia."],
+  ["apocryphal","Widely repeated but probably untrue.","The story about the founder is likely apocryphal."],
+  ["dilettante","Someone who dabbles in a subject without real commitment.","He’s a dilettante who switches hobbies every month."],
+  ["euphemism","A mild word used in place of a harsh or blunt one.","‘Let go’ is a euphemism for being fired."],
+  ["facetious","Treating serious matters with inappropriate humor.","Don’t be facetious; this is important."],
+  ["gregarious","Sociable and fond of company.","Her gregarious personality makes her the life of the party."],
+  ["harbinger","A sign of something to come.","The first robin is a harbinger of spring."],
+  ["inoculate","To vaccinate; to protect against something.","The clinic will inoculate children against measles."],
+  ["insouciance","A casual lack of concern.","He shrugged off the criticism with total insouciance."],
+  ["mellifluous","Sweet and smooth-sounding.","The narrator has a mellifluous voice."],
+  ["obfuscate","To make something unclear or confusing on purpose.","The report seemed designed to obfuscate the facts."],
+  ["ostentatious","Showy in a way meant to impress.","The mansion’s gold fixtures were ostentatious."],
+  ["quixotic","Idealistic in an unrealistic way.","His quixotic plan was to fix the city’s traffic by himself."],
+  ["sacrosanct","Too important or sacred to be changed.","Sunday brunch is sacrosanct in our house."],
+  ["schadenfreude","Pleasure taken in someone else’s misfortune.","Watching the rival team lose gave him a little schadenfreude."],
+  ["tenacious","Persistent and determined; not letting go.","She’s a tenacious negotiator."],
+  ["accoutrements","Accessories or equipment for a particular activity.","The bar had all the accoutrements for making cocktails."],
+  ["anomaly","Something that deviates from what is normal.","The warm December was a weather anomaly."],
+  ["archipelago","A group of islands.","The Philippines is an archipelago of over seven thousand islands."],
+  ["belligerent","Hostile and aggressive.","The belligerent customer demanded a refund."],
+  ["charlatan","A person who falsely claims special knowledge or skill.","The so-called psychic turned out to be a charlatan."],
+  ["condescension","An attitude of looking down on others.","His condescension made the meeting tense."],
+  ["disingenuous","Insincere; pretending to know less than you do.","It’s disingenuous to claim you never saw the email."],
+  ["exacerbate","To make a problem worse.","Scratching will only exacerbate the rash."],
+  ["fastidious","Very attentive to detail and cleanliness.","He’s fastidious about keeping his car spotless."],
+  ["gubernatorial","Relating to a state governor.","The gubernatorial debate airs tonight."],
+  ["incongruous","Out of place; not fitting in.","A tuxedo looked incongruous at the beach party."],
+  ["indefatigable","Never tiring; persistent.","The indefatigable volunteers worked through the night."],
+  ["lackadaisical","Lacking enthusiasm or effort.","His lackadaisical defense cost the team the game."],
+  ["panacea","A solution for all problems.","Money isn’t a panacea for unhappiness."],
+  ["perfunctory","Done quickly, with minimal effort or care.","She gave a perfunctory nod and kept walking."],
+  ["posthumous","Happening after a person’s death.","The author won a posthumous award."],
+  ["soliloquy","A speech where a character speaks their thoughts alone on stage.","Hamlet’s soliloquy is the most famous in theater."],
+  ["subpoena","A legal order requiring someone to appear in court.","The witness received a subpoena last week."],
+  ["vestige","A trace of something that no longer exists.","The old wall is the last vestige of the fort."],
+  ["bourgeois","Relating to the middle class and its values.","They teased him about his bourgeois taste in furniture."],
+  ["nuance","A subtle difference in meaning, tone or feeling.","The translation lost the nuance of the original."],
+  ["obsolescence","The process of becoming outdated.","Planned obsolescence keeps people buying new phones."]
+];
+
+const $ = id => document.getElementById(id);
+let deck = [], current = null, results = [], hidden = false;
+let level = "medium", seconds = 60;
+let deadline = 0, remainingMs = 0, ticker = null, paused = false, timeUp = false, audioCtx = null;
+for (let m = 0; m <= 60; m++) $("mins").add(new Option(m, m, m === 5, m === 5));
+for (let s = 0; s < 60; s++) $("secs").add(new Option(String(s).padStart(2, "0"), s));
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function fmt(ms) { const s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active"); window.scrollTo(0, 0);
+}
+function stopSpeech() { if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+
+/* Timer */
+function renderTimer(ms) {
+  $("time").textContent = fmt(ms);
+  $("barFill").style.width = (ms / (seconds * 1000) * 100) + "%";
+  $("timer").classList.toggle("low", ms <= 10000 && ms > 0);
+}
+function tick() {
+  const ms = Math.max(0, deadline - Date.now());
+  renderTimer(ms);
+  if (ms === 0) {
+    clearInterval(ticker); ticker = null; timeUp = true;
+    $("timer").classList.remove("low"); $("timer").classList.add("up");
+    $("time").textContent = "Time’s up";
+    $("pauseBtn").hidden = true;
+    buzz();
+    setTimeout(endGame, 1200);
+  }
+}
+function startTimer() {
+  clearInterval(ticker); paused = false; timeUp = false;
+  $("timer").classList.remove("up", "low");
+  $("pauseBtn").hidden = false; $("pauseBtn").textContent = "Pause";
+  deadline = Date.now() + seconds * 1000;
+  renderTimer(seconds * 1000);
+  ticker = setInterval(tick, 200);
+}
+function togglePause() {
+  if (timeUp) return;
+  if (!paused) {
+    remainingMs = Math.max(0, deadline - Date.now());
+    clearInterval(ticker); ticker = null; paused = true;
+    $("pauseBtn").textContent = "Resume";
+  } else {
+    deadline = Date.now() + remainingMs;
+    ticker = setInterval(tick, 200); paused = false;
+    $("pauseBtn").textContent = "Pause";
+  }
+}
+function buzz() {
+  try { if (navigator.vibrate) navigator.vibrate([300, 120, 300]); } catch (e) {}
+  try {
+    if (!audioCtx) return;
+    [0, 0.35].forEach(t => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "square"; o.frequency.value = 220;
+      g.gain.setValueAtTime(0.15, audioCtx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.3);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + 0.3);
+    });
+  } catch (e) {}
+}
+
+/* Game flow */
+function nextWord() {
+  if (!deck.length) { endGame(); return; }
+  current = deck.pop();
+  const [w, d, s] = current;
+  $("word").textContent = w;
+  $("definition").textContent = d;
+  $("sentence").textContent = "“" + s + "”";
+  $("counter").textContent = "Word " + (results.length + 1);
+  const card = $("card"); card.classList.remove("flip"); void card.offsetWidth; card.classList.add("flip");
+  window.scrollTo(0, 0);
+}
+function record(r) {
+  stopSpeech();
+  results.push({ w: current[0], r });
+  nextWord();
+}
+function endGame() {
+  clearInterval(ticker); ticker = null; stopSpeech();
+  const n = r => results.filter(x => x.r === r).length;
+  $("nCorrect").textContent = n("correct");
+  $("nPass").textContent = n("pass");
+  $("nWrong").textContent = n("wrong");
+  const left = timeUp ? 0 : (paused ? remainingMs : Math.max(0, deadline - Date.now()));
+  $("summary").textContent = results.length + (results.length === 1 ? " word" : " words") + " judged on " +
+    (level === "hard" ? "Hard" : "Medium") + " in " + fmt(seconds * 1000 - left) + (timeUp ? ". Time ran out." : ".");
+  const log = $("log"); log.innerHTML = "";
+  if (!results.length) {
+    const p = document.createElement("li"); p.className = "empty"; p.textContent = "No words were judged this round."; log.appendChild(p);
+  }
+  const label = { correct: "Correct", pass: "Passed", wrong: "Wrong" };
+  const style = { correct: "background:var(--green);color:var(--on-color)", pass: "background:var(--honey);color:#2A1A3A", wrong: "background:var(--red);color:var(--on-color)" };
+  results.forEach(x => {
+    const li = document.createElement("li");
+    const w = document.createElement("span"); w.textContent = x.w;
+    const t = document.createElement("span"); t.className = "tag"; t.style.cssText = style[x.r]; t.textContent = label[x.r];
+    li.append(w, t); log.appendChild(li);
+  });
+  show("results");
+}
+
+$("startBtn").onclick = () => {
+  level = document.querySelector('input[name="level"]:checked').value;
+  seconds = Number($("mins").value) * 60 + Number($("secs").value);
+  if (seconds <= 0) { $("err").hidden = false; return; }
+  $("err").hidden = true;
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
+  deck = shuffle((level === "hard" ? HARD : MEDIUM).slice());
+  results = [];
+  show("judge");
+  nextWord();
+  startTimer();
+};
+document.querySelectorAll(".verdict").forEach(b => b.onclick = () => record(b.dataset.r));
+$("endBtn").onclick = endGame;
+$("againBtn").onclick = () => show("start");
+$("pauseBtn").onclick = togglePause;
+$("hideBtn").onclick = () => {
+  hidden = !hidden;
+  $("word").classList.toggle("hidden", hidden);
+  $("hideBtn").textContent = hidden ? "Show word" : "Hide word";
+};
+if ("speechSynthesis" in window) {
+  $("sayBtn").onclick = () => {
+    stopSpeech();
+    const u = new SpeechSynthesisUtterance($("word").textContent);
+    u.rate = 0.8; u.lang = "en-US"; speechSynthesis.speak(u);
+  };
+} else { $("sayBtn").style.display = "none"; }
+</script>
+</body>
+</html>
