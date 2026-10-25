@@ -130,6 +130,7 @@ button:focus-visible, input:focus-visible + span { outline: 3px solid var(--hone
     <legend>Word level</legend>
     <div class="seg">
       <label><input type="radio" name="level" value="medium" checked><span>Medium</span></label>
+      <label><input type="radio" name="level" value="mediumNew"><span>Medium-New</span></label>
       <label><input type="radio" name="level" value="hard"><span>Hard</span></label>
     </div>
   </fieldset>
@@ -292,6 +293,121 @@ const MEDIUM = [
   ["quesadilla","A tortilla filled with cheese and grilled until melted.","I ordered a chicken quesadilla."],
   ["connoisseur","An expert judge in matters of taste.","He considers himself a connoisseur of barbecue."],
   ["unnecessary","Not needed.","Let’s avoid any unnecessary drama tonight."]
+];
+
+const MEDIUM_NEW = [
+  ["accidentally","By chance; without meaning to.","I accidentally sent the text to the wrong person."],
+  ["aggressive","Ready to attack or confront; forceful.","The goose got aggressive when we walked near its nest."],
+  ["apparent","Clearly visible or understood; obvious.","It was apparent that nobody had studied for the quiz."],
+  ["beginning","The point in time or space where something starts.","Let’s watch the movie from the beginning."],
+  ["calendar","A chart showing the days, weeks and months of a year.","Mark the party on the calendar so we don’t forget."],
+  ["Caribbean","The sea and islands between North and South America.","They took a cruise through the Caribbean."],
+  ["catastrophe","A sudden event causing great damage or suffering.","Forgetting the cake would have been a catastrophe."],
+  ["changeable","Likely to change; unpredictable.","Spring weather here is very changeable."],
+  ["collectible","Worth collecting; an item people collect.","That old lunchbox is now a valuable collectible."],
+  ["commitment","A promise or dedication to a cause or activity.","Joining the team is a big time commitment."],
+  ["conscious","Awake and aware of your surroundings.","She was conscious of everyone staring at her."],
+  ["controversy","A public disagreement that many people argue about.","The referee’s call caused a huge controversy."],
+  ["curiosity","A strong desire to know or learn something.","Curiosity made him open the mysterious box."],
+  ["deceive","To make someone believe something that isn’t true.","Don’t let the friendly smile deceive you."],
+  ["desperate","Feeling hopeless and willing to try anything.","The thirsty hikers were desperate for water."],
+  ["discipline","Training to follow rules or control behavior.","Learning the piano takes a lot of discipline."],
+  ["dumbbell","A short bar with weights at each end, used for exercise.","He lifted a dumbbell while watching TV."],
+  ["ecstatic","Extremely happy and excited.","She was ecstatic when she won the contest."],
+  ["eighth","Coming after the seventh in a series.","Today is my brother’s eighth birthday."],
+  ["environment","The natural world, or the surroundings you live in.","Recycling helps protect the environment."],
+  ["exaggerate","To make something seem bigger or more important than it is.","Don’t exaggerate — the fish wasn’t that big."],
+  ["existence","The state of being real or alive.","Scientists debate the existence of life on other planets."],
+  ["familiar","Well known from long or close association.","That song sounds familiar."],
+  ["fascinate","To strongly attract someone’s interest.","Volcanoes have always fascinated me."],
+  ["fiery","Like fire; burning, or full of strong emotion.","She gave a fiery speech about saving the park."],
+  ["foreign","From or relating to another country.","He collects coins from foreign countries."],
+  ["government","The group of people who run a country or state.","The government announced a new holiday."],
+  ["guidance","Help or advice about how to do something.","The coach gave us guidance on our free throws."],
+  ["humorous","Funny; causing laughter.","Grandpa told a humorous story at dinner."],
+  ["ignorance","Lack of knowledge or information.","His mistake came from ignorance, not bad intentions."],
+  ["immediately","At once; without delay.","Please come downstairs immediately."],
+  ["independent","Free from outside control; not relying on others.","She’s very independent and likes to do things herself."],
+  ["intelligence","The ability to learn, understand and think.","Dolphins are known for their intelligence."],
+  ["jewelry","Decorative items worn on the body, like rings and necklaces.","She keeps her jewelry in a small wooden box."],
+  ["judgment","The ability to make good decisions, or a decision itself.","Use your best judgment when crossing the street."],
+  ["knowledge","Facts and understanding gained through learning or experience.","Her knowledge of dinosaurs is amazing."],
+  ["license","An official document giving permission to do something.","My sister just got her driver’s license."],
+  ["lightning","A flash of light in the sky caused by electricity in a storm.","Lightning lit up the whole sky."],
+  ["maneuver","A skillful movement or action, often to get around something.","The pilot made a tricky maneuver to land the plane."],
+  ["memento","An object kept as a reminder of a person or event.","She kept the ticket stub as a memento of the concert."],
+  ["occasion","A particular time or special event.","Wear something nice — it’s a special occasion."],
+  ["omission","Something left out or not done.","The omission of her name from the list was a mistake."],
+  ["opportunity","A chance to do something.","This trip is a great opportunity to learn Spanish."],
+  ["pastime","An activity done regularly for enjoyment.","Fishing is my dad’s favorite pastime."],
+  ["perceive","To notice or become aware of something.","Dogs can perceive sounds we can’t hear."],
+  ["permanent","Lasting forever or for a very long time.","Be careful — that marker is permanent."],
+  ["persistent","Continuing firmly despite difficulty.","The persistent knocking finally woke him up."],
+  ["physician","A medical doctor.","The physician listened to my heartbeat."],
+  ["pigeon","A gray bird often seen in cities.","A pigeon landed on the park bench next to us."],
+  ["potatoes","Starchy vegetables that grow underground.","We had mashed potatoes with dinner."],
+  ["preferred","Liked better than other options.","Chocolate is my preferred ice cream flavor."],
+  ["prejudice","An unfair opinion formed without enough knowledge.","The story teaches us to overcome prejudice."],
+  ["professor","A teacher at a college or university.","The professor wrote equations all over the board."],
+  ["publicly","In a way that is open to everyone.","The winner was announced publicly at the assembly."],
+  ["recommend","To suggest something as good or suitable.","I recommend the pancakes at this diner."],
+  ["referred","Mentioned, or sent to someone for help.","My doctor referred me to an eye specialist."],
+  ["relevant","Closely connected to the subject at hand.","Only include facts that are relevant to your topic."],
+  ["religious","Relating to faith or belief in a god or gods.","The town has many old religious buildings."],
+  ["repetition","Doing or saying something again and again.","Repetition helps you memorize spelling words."],
+  ["rhyme","Words that end with the same sound.","“Cat” and “hat” rhyme."],
+  ["ridiculous","Very silly or unreasonable.","He wore a ridiculous hat with a propeller on top."],
+  ["sacrifice","Giving up something valued for something more important.","She made a sacrifice to help her friend."],
+  ["schedule","A plan listing when things will happen.","Check the schedule to see when the bus leaves."],
+  ["scissors","A tool with two blades used for cutting.","Pass me the scissors so I can cut the ribbon."],
+  ["secretary","A person who handles letters, records and appointments.","The school secretary answered the phone."],
+  ["sergeant","A rank of officer in the military or police.","The sergeant gave orders to the troops."],
+  ["siege","Surrounding a place to force it to surrender.","The castle survived a long siege."],
+  ["sincerely","In a truthful, honest way.","I sincerely apologize for being late."],
+  ["succeed","To achieve what you were trying to do.","If you practice, you will succeed."],
+  ["sufficient","Enough for a particular purpose.","We have sufficient snacks for the whole trip."],
+  ["symmetry","When both halves of something match exactly.","A butterfly’s wings show perfect symmetry."],
+  ["technique","A particular way of doing something skillfully.","The swimmer worked on her breathing technique."],
+  ["thorough","Complete and careful about every detail.","The detective did a thorough search of the room."],
+  ["tongue","The muscle in your mouth used for tasting and talking.","The dog licked my face with its tongue."],
+  ["twelfth","Coming after the eleventh in a series.","She finished in twelfth place."],
+  ["villain","The bad character in a story.","The villain tried to steal the crown."],
+  ["weird","Strange or unusual.","There’s a weird noise coming from the attic."],
+  ["whether","Used to show a choice between options.","I can’t decide whether to wear red or blue."],
+  ["withhold","To refuse to give something.","The teacher will withhold recess if we keep talking."],
+  ["accessible","Easy to reach, enter or use.","The building is accessible for wheelchairs."],
+  ["anonymous","Having an unknown or hidden name.","An anonymous donor gave money to the library."],
+  ["apparatus","Equipment used for a particular purpose.","The scientist set up the apparatus for the experiment."],
+  ["bureau","An office or agency; also a chest of drawers.","She works at the weather bureau."],
+  ["cylinder","A solid shape with straight sides and circular ends.","A soup can is shaped like a cylinder."],
+  ["jeopardy","Danger of loss, harm or failure.","Skipping practice put his spot on the team in jeopardy."],
+  ["kaleidoscope","A tube with mirrors and colored pieces that make patterns.","Turn the kaleidoscope to see new designs."],
+  ["laboratory","A room where scientific experiments are done.","The students wore goggles in the laboratory."],
+  ["marshmallow","A soft, spongy white candy.","He toasted a marshmallow over the campfire."],
+  ["parliament","A group of elected people who make a country’s laws.","The British Parliament meets in London."],
+  ["pharaoh","A ruler of ancient Egypt.","The pharaoh was buried inside a pyramid."],
+  ["rhinoceros","A large animal with thick skin and one or two horns on its nose.","The rhinoceros charged across the grassland."],
+  ["tortoise","A slow-moving land turtle.","The tortoise won the race against the hare."],
+  ["xylophone","An instrument with wooden bars you hit with mallets.","She played a song on the xylophone."],
+  ["chaos","Complete disorder and confusion.","The classroom was in chaos when the hamster escaped."],
+  ["cantaloupe","A melon with orange flesh and a rough skin.","We had sliced cantaloupe for breakfast."],
+  ["croissant","A flaky, crescent-shaped pastry.","He ate a warm croissant at the bakery."],
+  ["spaghetti","Long, thin strings of pasta.","We had spaghetti and meatballs for dinner."],
+  ["guacamole","A dip made from mashed avocados.","Pass the chips and guacamole, please."],
+  ["asthma","A condition that makes breathing difficult.","She carries an inhaler for her asthma."],
+  ["benign","Gentle and harmless.","The doctor said the bump was benign."],
+  ["buoyant","Able to float; also cheerful.","The life jacket keeps you buoyant in the water."],
+  ["dachshund","A dog breed with a long body and short legs.","Our dachshund looks like a hot dog."],
+  ["isthmus","A narrow strip of land connecting two larger areas.","Panama sits on an isthmus between two continents."],
+  ["khaki","A light brownish-yellow color or fabric.","He wore khaki pants to the picnic."],
+  ["lasagna","Baked pasta layered with cheese and sauce.","Mom made a giant pan of lasagna."],
+  ["nauseous","Feeling like you might throw up.","The roller coaster made me feel nauseous."],
+  ["apostrophe","A punctuation mark ( ’ ) showing possession or a missing letter.","Don’t forget the apostrophe in “don’t.”"],
+  ["algorithm","A set of step-by-step rules for solving a problem.","The app uses an algorithm to suggest songs."],
+  ["hemisphere","Half of a sphere, especially half of the Earth.","Australia is in the Southern Hemisphere."],
+  ["matinee","An afternoon showing of a movie or play.","We saw the matinee because tickets were cheaper."],
+  ["facade","The front of a building; or a false appearance.","The old theater has a beautiful brick facade."],
+  ["chameleon","A lizard that can change the color of its skin.","The chameleon blended in with the leaves."]
 ];
 
 const HARD = [
@@ -471,7 +587,7 @@ function endGame() {
   $("nWrong").textContent = n("wrong");
   const left = timeUp ? 0 : (paused ? remainingMs : Math.max(0, deadline - Date.now()));
   $("summary").textContent = results.length + (results.length === 1 ? " word" : " words") + " judged on " +
-    (level === "hard" ? "Hard" : "Medium") + " in " + fmt(seconds * 1000 - left) + (timeUp ? ". Time ran out." : ".");
+    ({ medium: "Medium", mediumNew: "Medium-New", hard: "Hard" }[level]) + " in " + fmt(seconds * 1000 - left) + (timeUp ? ". Time ran out." : ".");
   const log = $("log"); log.innerHTML = "";
   if (!results.length) {
     const p = document.createElement("li"); p.className = "empty"; p.textContent = "No words were judged this round."; log.appendChild(p);
@@ -493,7 +609,7 @@ $("startBtn").onclick = () => {
   if (seconds <= 0) { $("err").hidden = false; return; }
   $("err").hidden = true;
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
-  deck = shuffle((level === "hard" ? HARD : MEDIUM).slice());
+  deck = shuffle(({ medium: MEDIUM, mediumNew: MEDIUM_NEW, hard: HARD }[level]).slice());
   results = [];
   show("judge");
   nextWord();
