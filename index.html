@@ -69,6 +69,9 @@ button:focus-visible, input:focus-visible + span { outline: 3px solid var(--hone
 .clock select:focus-visible { outline: 3px solid var(--honey-deep); border-radius: .5rem; }
 .clock span { color: var(--muted); font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1rem; }
 .err { color: var(--red); margin: .6rem 0 0; font-size: 1rem; }
+.session { display: flex; flex-direction: column; align-items: center; gap: .35rem; }
+.session-note { margin: 0; color: var(--muted); font-size: 1rem; }
+.session-on { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 500; font-size: 1.05rem; background: var(--surface); border: 2px solid var(--honey); border-radius: 999px; padding: .35rem 1rem; }
 
 /* Judge */
 #judge { gap: 1.1rem; }
@@ -142,6 +145,19 @@ button:focus-visible, input:focus-visible + span { outline: 3px solid var(--hone
       <label><select id="secs" aria-label="Seconds"></select><span>sec</span></label>
     </div>
     <p class="err" id="err" hidden>Set a game length longer than 0 seconds.</p>
+  </fieldset>
+
+  <fieldset class="setting">
+    <legend>Game session</legend>
+    <div class="session" id="sessionOff">
+      <button class="pill" id="sessionStartBtn">Start game session</button>
+      <p class="session-note">No repeat words until you end the session.</p>
+    </div>
+    <div class="session" id="sessionOn" hidden>
+      <span class="session-on" id="sessionStatus">Session on</span>
+      <button class="text-btn" id="sessionEndBtn">End session</button>
+    </div>
+    <p class="err" id="poolErr" hidden></p>
   </fieldset>
 
   <button class="hex display" id="startBtn">Start</button>
@@ -498,6 +514,27 @@ let deadline = 0, remainingMs = 0, ticker = null, paused = false, timeUp = false
 for (let m = 0; m <= 60; m++) $("mins").add(new Option(m, m, m === 5, m === 5));
 for (let s = 0; s < 60; s++) $("secs").add(new Option(String(s).padStart(2, "0"), s));
 
+/* Game session: remembers used words in this browser so they don't repeat until the session ends */
+const SESSION_KEY = "csb-session";
+let session = null;
+try { session = JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) {}
+function saveSession() {
+  try { session ? localStorage.setItem(SESSION_KEY, JSON.stringify(session)) : localStorage.removeItem(SESSION_KEY); } catch (e) {}
+}
+function renderSession() {
+  $("sessionOff").hidden = !!session;
+  $("sessionOn").hidden = !session;
+  if (session) {
+    const n = session.used.length;
+    $("sessionStatus").textContent = "Session on · " + n + (n === 1 ? " word" : " words") + " used";
+  }
+  $("poolErr").hidden = true;
+}
+function markUsed(w) {
+  if (session && !session.used.includes(w)) { session.used.push(w); saveSession(); }
+}
+renderSession();
+
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
@@ -566,6 +603,7 @@ function buzz() {
 function nextWord() {
   if (!deck.length) { endGame(); return; }
   current = deck.pop();
+  markUsed(current[0]);
   const [w, d, s] = current;
   $("word").textContent = w;
   $("definition").textContent = d;
@@ -609,7 +647,15 @@ $("startBtn").onclick = () => {
   if (seconds <= 0) { $("err").hidden = false; return; }
   $("err").hidden = true;
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
-  deck = shuffle(({ medium: MEDIUM, mediumNew: MEDIUM_NEW, hard: HARD }[level]).slice());
+  const names = { medium: "Medium", mediumNew: "Medium-New", hard: "Hard" };
+  let pool = { medium: MEDIUM, mediumNew: MEDIUM_NEW, hard: HARD }[level];
+  if (session) pool = pool.filter(x => !session.used.includes(x[0]));
+  if (!pool.length) {
+    $("poolErr").textContent = "Every " + names[level] + " word has been used this session. Pick another level or end the session.";
+    $("poolErr").hidden = false; return;
+  }
+  $("poolErr").hidden = true;
+  deck = shuffle(pool.slice());
   results = [];
   show("judge");
   nextWord();
@@ -617,7 +663,9 @@ $("startBtn").onclick = () => {
 };
 document.querySelectorAll(".verdict").forEach(b => b.onclick = () => record(b.dataset.r));
 $("endBtn").onclick = endGame;
-$("againBtn").onclick = () => show("start");
+$("againBtn").onclick = () => { renderSession(); show("start"); };
+$("sessionStartBtn").onclick = () => { session = { used: [] }; saveSession(); renderSession(); };
+$("sessionEndBtn").onclick = () => { session = null; saveSession(); renderSession(); };
 $("pauseBtn").onclick = togglePause;
 $("hideBtn").onclick = () => {
   hidden = !hidden;
